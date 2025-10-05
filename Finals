@@ -1,0 +1,105 @@
+package com.mycompany.payroll.system;
+import javax.swing.*;
+import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
+import java.util.ArrayList;
+
+public class PayrollSystem {
+    public static void main(String[] args) {
+
+        UIManager.put("OptionPane.background", new ColorUIResource(240, 248, 255));
+        UIManager.put("Panel.background", new ColorUIResource(240, 248, 255));
+        UIManager.put("OptionPane.messageForeground", new ColorUIResource(0, 51, 102));
+
+
+        JOptionPane.showMessageDialog(
+            null,
+            "<html><h2 style='color:#003366;'>Welcome to the Payroll System</h2>"
+            + "<p>Let's calculate employee salaries with style!</p></html>",
+            "Payroll System",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
+
+        int numEmployees = Integer.parseInt(JOptionPane.showInputDialog("Enter number of employees:"));
+
+
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Double> grossPays = new ArrayList<>();
+        ArrayList<Double> deductions = new ArrayList<>();
+        ArrayList<Double> netPays = new ArrayList<>();
+
+
+        for (int i = 1; i <= numEmployees; i++) {
+            String name = JOptionPane.showInputDialog("Enter Employee #" + i + " Name:");
+            double hoursWorked = Double.parseDouble(JOptionPane.showInputDialog("Enter Hours Worked for " + name + ":"));
+            double hourlyRate = Double.parseDouble(JOptionPane.showInputDialog("Enter Hourly Rate for " + name + ":"));
+
+ 
+            double grossPay = hoursWorked * hourlyRate;
+            double tax = grossPay * 0.10;
+            double sss = grossPay * 0.05;
+            double pagibig = 100;
+            double totalDeductions = tax + sss + pagibig;
+            double netPay = grossPay - totalDeductions;
+
+
+            names.add(name);
+            grossPays.add(grossPay);
+            deductions.add(totalDeductions);
+            netPays.add(netPay);
+
+
+            JOptionPane.showMessageDialog(
+                null,
+                "<html><h3 style='color:#004080;'>Payroll Summary for " + name + "</h3>"
+                + "<p><b>Hours Worked:</b> " + hoursWorked + "<br>"
+                + "<b>Hourly Rate:</b> ₱" + String.format("%.2f", hourlyRate) + "<br>"
+                + "<b>Gross Pay:</b> ₱" + String.format("%.2f", grossPay) + "<br>"
+                + "<b>Deductions:</b> ₱" + String.format("%.2f", totalDeductions) + "<br>"
+                + "<b style='color:#006600;'>Net Pay:</b> ₱" + String.format("%.2f", netPay) + "</p></html>",
+                "Employee Payroll",
+                JOptionPane.PLAIN_MESSAGE
+            );
+        }
+
+
+        StringBuilder summary = new StringBuilder();
+        summary.append("<html><h2 style='color:#003366;'> Final Payroll List</h2>");
+        summary.append("<table border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse;'>");
+        summary.append("<tr style='background-color:#cce7ff;'>"
+                     + "<th>Employee Name</th><th>Gross Pay</th><th>Deductions</th><th>Net Pay</th></tr>");
+
+        for (int i = 0; i < names.size(); i++) {
+            summary.append("<tr><td>")
+                   .append(names.get(i))
+                   .append("</td><td>₱")
+                   .append(String.format("%.2f", grossPays.get(i)))
+                   .append("</td><td>₱")
+                   .append(String.format("%.2f", deductions.get(i)))
+                   .append("</td><td><b>₱")
+                   .append(String.format("%.2f", netPays.get(i)))
+                   .append("</b></td></tr>");
+        }
+
+        summary.append("</table></html>");
+
+
+        JOptionPane.showMessageDialog(
+            null,
+            new JLabel(summary.toString()),
+            "Final Payroll Summary",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
+
+        JOptionPane.showMessageDialog(
+            null,
+            "<html><h3 style='color:#003366;'>Payroll Processing Complete!</h3>"
+            + "<p>All employee records have been processed successfully.</p></html>",
+            "Done",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+}
