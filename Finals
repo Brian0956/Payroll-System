@@ -1,18 +1,69 @@
+//Employee
 package com.mycompany.payroll.system;
-import javax.swing.*;
+public class Employee {
+    private String name;
+    private double hoursWorked;
+    private double hourlyRate;
+    private double grossPay;
+    private double deductions;
+    private double netPay;
+
+    public Employee() {}
+
+    public Employee(String name, double hoursWorked, double hourlyRate) {
+        this.name = name;
+        this.hoursWorked = hoursWorked;
+        this.hourlyRate = hourlyRate;
+    }
+
+    public void computePayroll() {
+        double tax = (hoursWorked * hourlyRate) * 0.10;
+        double sss = (hoursWorked * hourlyRate) * 0.05;
+        double pagibig = 100;
+        grossPay = hoursWorked * hourlyRate;
+        deductions = tax + sss + pagibig;
+        netPay = grossPay - deductions;
+    }
+    public String getName() { return name; }
+    public double getGrossPay() { return grossPay; }
+    public double getDeductions() { return deductions; }
+    public double getNetPay() { return netPay; }
+    public double getHoursWorked() { return hoursWorked; }
+    public double getHourlyRate() { return hourlyRate; }
+}
+
+//PayrollCalculator
+package com.mycompany.payroll.system;
+import java.util.ArrayList;
+
+public class PayrollCalculator extends Employee {
+    protected ArrayList<Employee> employees = new ArrayList<>();
+
+    public void addEmployee(Employee emp) {
+        emp.computePayroll();
+        employees.add(emp);
+    }
+
+    public ArrayList<Employee> getEmployees() {
+        return employees;
+    }
+}
+
+//PayrollUI
+package com.mycompany.payroll.system;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
-import java.util.ArrayList;
 
-public class PayrollSystem {
-    public static void main(String[] args) {
+public class PayrollUI extends PayrollCalculator {
 
+    public PayrollUI() {
         UIManager.put("OptionPane.background", new ColorUIResource(240, 248, 255));
         UIManager.put("Panel.background", new ColorUIResource(240, 248, 255));
         UIManager.put("OptionPane.messageForeground", new ColorUIResource(0, 51, 102));
+    }
 
-
+    public void showWelcome() {
         JOptionPane.showMessageDialog(
             null,
             "<html><h2 style='color:#003366;'>Welcome to the Payroll System</h2>"
@@ -20,80 +71,58 @@ public class PayrollSystem {
             "Payroll System",
             JOptionPane.INFORMATION_MESSAGE
         );
+    }
 
+    public int askNumberOfEmployees() {
+        return Integer.parseInt(JOptionPane.showInputDialog("Enter number of employees:"));
+    }
 
-        int numEmployees = Integer.parseInt(JOptionPane.showInputDialog("Enter number of employees:"));
+    public Employee getEmployeeInfo(int i) {
+        String name = JOptionPane.showInputDialog("Enter Employee #" + i + " Name:");
+        double hoursWorked = Double.parseDouble(JOptionPane.showInputDialog("Enter Hours Worked for " + name + ":"));
+        double hourlyRate = Double.parseDouble(JOptionPane.showInputDialog("Enter Hourly Rate for " + name + ":"));
+        return new Employee(name, hoursWorked, hourlyRate);
+    }
 
+    public void showEmployeeSummary(Employee e) {
+        JOptionPane.showMessageDialog(
+            null,
+            "<html><h3 style='color:#004080;'>Payroll Summary for " + e.getName() + "</h3>"
+            + "<p><b>Hours Worked:</b> " + e.getHoursWorked() + "<br>"
+            + "<b>Hourly Rate:</b> ₱" + String.format("%.2f", e.getHourlyRate()) + "<br>"
+            + "<b>Gross Pay:</b> ₱" + String.format("%.2f", e.getGrossPay()) + "<br>"
+            + "<b>Deductions:</b> ₱" + String.format("%.2f", e.getDeductions()) + "<br>"
+            + "<b style='color:#006600;'>Net Pay:</b> ₱" + String.format("%.2f", e.getNetPay()) + "</p></html>",
+            "Employee Payroll",
+            JOptionPane.PLAIN_MESSAGE
+        );
+    }
 
-        ArrayList<String> names = new ArrayList<>();
-        ArrayList<Double> grossPays = new ArrayList<>();
-        ArrayList<Double> deductions = new ArrayList<>();
-        ArrayList<Double> netPays = new ArrayList<>();
-
-
-        for (int i = 1; i <= numEmployees; i++) {
-            String name = JOptionPane.showInputDialog("Enter Employee #" + i + " Name:");
-            double hoursWorked = Double.parseDouble(JOptionPane.showInputDialog("Enter Hours Worked for " + name + ":"));
-            double hourlyRate = Double.parseDouble(JOptionPane.showInputDialog("Enter Hourly Rate for " + name + ":"));
-
- 
-            double grossPay = hoursWorked * hourlyRate;
-            double tax = grossPay * 0.10;
-            double sss = grossPay * 0.05;
-            double pagibig = 100;
-            double totalDeductions = tax + sss + pagibig;
-            double netPay = grossPay - totalDeductions;
-
-
-            names.add(name);
-            grossPays.add(grossPay);
-            deductions.add(totalDeductions);
-            netPays.add(netPay);
-
-
-            JOptionPane.showMessageDialog(
-                null,
-                "<html><h3 style='color:#004080;'>Payroll Summary for " + name + "</h3>"
-                + "<p><b>Hours Worked:</b> " + hoursWorked + "<br>"
-                + "<b>Hourly Rate:</b> ₱" + String.format("%.2f", hourlyRate) + "<br>"
-                + "<b>Gross Pay:</b> ₱" + String.format("%.2f", grossPay) + "<br>"
-                + "<b>Deductions:</b> ₱" + String.format("%.2f", totalDeductions) + "<br>"
-                + "<b style='color:#006600;'>Net Pay:</b> ₱" + String.format("%.2f", netPay) + "</p></html>",
-                "Employee Payroll",
-                JOptionPane.PLAIN_MESSAGE
-            );
-        }
-
-
+    public void showFinalSummary() {
         StringBuilder summary = new StringBuilder();
         summary.append("<html><h2 style='color:#003366;'> Final Payroll List</h2>");
         summary.append("<table border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse;'>");
         summary.append("<tr style='background-color:#cce7ff;'>"
                      + "<th>Employee Name</th><th>Gross Pay</th><th>Deductions</th><th>Net Pay</th></tr>");
 
-        for (int i = 0; i < names.size(); i++) {
+        for (Employee e : employees) {
             summary.append("<tr><td>")
-                   .append(names.get(i))
+                   .append(e.getName())
                    .append("</td><td>₱")
-                   .append(String.format("%.2f", grossPays.get(i)))
+                   .append(String.format("%.2f", e.getGrossPay()))
                    .append("</td><td>₱")
-                   .append(String.format("%.2f", deductions.get(i)))
+                   .append(String.format("%.2f", e.getDeductions()))
                    .append("</td><td><b>₱")
-                   .append(String.format("%.2f", netPays.get(i)))
+                   .append(String.format("%.2f", e.getNetPay()))
                    .append("</b></td></tr>");
         }
 
         summary.append("</table></html>");
 
+        JOptionPane.showMessageDialog(null, new JLabel(summary.toString()), "Final Payroll Summary", JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        JOptionPane.showMessageDialog(
-            null,
-            new JLabel(summary.toString()),
-            "Final Payroll Summary",
-            JOptionPane.INFORMATION_MESSAGE
-        );
-
-
+    public void showCompletion() {
         JOptionPane.showMessageDialog(
             null,
             "<html><h3 style='color:#003366;'>Payroll Processing Complete!</h3>"
@@ -101,5 +130,25 @@ public class PayrollSystem {
             "Done",
             JOptionPane.INFORMATION_MESSAGE
         );
+    }
+}
+
+//PayrollSystem
+package com.mycompany.payroll.system;
+public class PayrollSystem {
+    public static void main(String[] args) {
+        PayrollUI ui = new PayrollUI();
+
+        ui.showWelcome();
+        int numEmployees = ui.askNumberOfEmployees();
+
+        for (int i = 1; i <= numEmployees; i++) {
+            Employee emp = ui.getEmployeeInfo(i);
+            ui.addEmployee(emp); // inherited from PayrollCalculator
+            ui.showEmployeeSummary(emp);
+        }
+
+        ui.showFinalSummary();
+        ui.showCompletion();
     }
 }
